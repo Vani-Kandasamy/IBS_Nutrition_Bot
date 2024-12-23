@@ -7,7 +7,6 @@ import operator
 from pinecone import Pinecone
 from openai import OpenAI
 from langgraph.graph import START, END, StateGraph
-from IPython.display import Image, display
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.memory import MemorySaver
 
