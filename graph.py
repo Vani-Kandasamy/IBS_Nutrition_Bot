@@ -116,12 +116,16 @@ def semantic_search(state: BotState):
 
     return {"context": [similar_context]}
 
+#The answer_generator function is designed to produce a response based on the current state of the conversation and configuration settings.
 
 def answer_generator(state: BotState, config: RunnableConfig):
+    #context derived from previous interactions or predetermined data
     searched_context = state["context"]
+    #list of messages exchanged so far in the conversation
     messages = state["messages"]
 
     # generate the prompt as a system message
+    #structured prompt for the language model
     system_message_prompt = [SystemMessage(ANSWER_INSTRUCTIONS.format(context = searched_context ))]
     # invoke the llm
     answer = llm.invoke(system_message_prompt + messages, config)
