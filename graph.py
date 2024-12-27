@@ -133,6 +133,7 @@ def answer_generator(state: BotState, config: RunnableConfig):
     return {"answer": answer}
 
 
+#class StateGraph that helps define the flow of operations (or nodes) for managing chatbot interactions
 # add nodes and edges
 helper_builder = StateGraph(BotState)
 helper_builder.add_node("pinecone_retriever", semantic_search)
@@ -144,12 +145,16 @@ helper_builder.add_edge("pinecone_retriever", "answer_generator")
 helper_builder.add_edge("answer_generator", END)
 
 # compile the graph
+#The compiled graph, helper_graph, represents the pathway the chatbot will use to process and respond to user queries 
 helper_graph = helper_builder.compile()
 
-
+#asynchronous operations to handle potentially long-running tasks without blocking execution, 
+#which is especially useful in chatbots for real-time interaction
 async def graph_streamer(question_messages: list):
     # configurations
+    #Specifies which node's output should be streamed
     node_to_stream = 'answer_generator'
+    #might be used for managing session or context continuity.
     model_config = {"configurable": {"thread_id": "1"}}
     #input_message = HumanMessage(content=question)
     # streaming tokens
@@ -158,4 +163,7 @@ async def graph_streamer(question_messages: list):
         #print(event)
         if event["event"] == "on_chat_model_stream" and event['metadata'].get('langgraph_node','') == node_to_stream:
             data = event["data"]
+            #yield sends each piece of the content (data["chunk"].content) 
+            #one at a time back to the caller of this function. This allows for streaming a response piece-by-piece, 
+            #ideal for real-time feedback in a chatbot interaction
             yield data["chunk"].content
